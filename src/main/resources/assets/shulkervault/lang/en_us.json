@@ -1,3 +1,7 @@
 {
-  "item.shulkervault.reinforced_shulker_shell": "Reinforced Shulker Shell"
+  "item.shulkervault.reinforced_shulker_shell": "Reinforced Shulker Shell",
+  "block.shulkervault.shulker_vault": "Shulker Vault",
+  "item.shulkervault.shulker_vault": "Shulker Vault",
+  "block.shulkervault.advanced_shulker_vault": "Advanced Shulker Vault",
+  "item.shulkervault.advanced_shulker_vault": "Advanced Shulker Vault"
 }

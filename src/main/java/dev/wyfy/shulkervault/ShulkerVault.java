@@ -71,8 +71,9 @@ public class ShulkerVault {
         if(event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModItems.REINFORCED_SHULKER_SHELL);
         }
-        if(event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
+        if(event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
             event.accept(ModBlocks.SHULKER_VAULT);
+            event.accept(ModBlocks.ADVANCED_SHULKER_VAULT);
         }
     }
 

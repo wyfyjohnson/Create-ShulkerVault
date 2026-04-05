@@ -1,5 +1,6 @@
 package dev.wyfy.shulkervault.block;
 
+import com.simibubi.create.AllBlocks;
 import dev.wyfy.shulkervault.ShulkerVault;
 import dev.wyfy.shulkervault.item.ModItems;
 import net.minecraft.world.item.BlockItem;
@@ -17,9 +18,20 @@ public class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS =
             DeferredRegister.createBlocks(ShulkerVault.MOD_ID);
 
+    // Shulker Vault/Advanced Shulker Vault
     public static final DeferredBlock<Block> SHULKER_VAULT = registerBlock("shulker_vault",
-            () -> new Block(BlockBehaviour.Properties.of()
-                    .strength(4f).requiresCorrectToolForDrops().sound(SoundType.LODESTONE)));
+            () -> new ShulkerVaultBlock(BlockBehaviour.Properties.of()
+                    .strength(5.0f, 6.0f)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.VAULT)
+            ));
+
+    public static final DeferredBlock<Block> ADVANCED_SHULKER_VAULT = registerBlock("advanced_shulker_vault",
+            () -> new ShulkerVaultBlock(BlockBehaviour.Properties.of()
+                    .strength(5.0f, 6.0f)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.VAULT)
+            ));
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {
         DeferredBlock<T> toReturn = BLOCKS.register(name, block);
