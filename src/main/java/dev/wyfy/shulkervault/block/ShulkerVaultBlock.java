@@ -1,5 +1,6 @@
 package dev.wyfy.shulkervault.block;
 
+import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
@@ -8,7 +9,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 
-public class ShulkerVaultBlock extends Block {
+public class ShulkerVaultBlock extends Block implements IWrenchable {
     // 1. Define the property that allows the block to face all 6 directions
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
 

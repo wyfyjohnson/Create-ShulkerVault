@@ -8,8 +8,8 @@
     64
   ],
   "textures": {
-    "0": "shulkervault:block/shulker_vault",
-    "particle": "shulkervault:block/shulker_vault"
+    "0": "shulkervault:block/advanced_shulker_vault",
+    "particle": "shulkervault:block/advanced_shulker_vault"
   },
   "elements": [
     {

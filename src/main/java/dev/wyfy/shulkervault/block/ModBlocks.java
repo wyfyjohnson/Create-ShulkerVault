@@ -22,15 +22,13 @@ public class ModBlocks {
     public static final DeferredBlock<Block> SHULKER_VAULT = registerBlock("shulker_vault",
             () -> new ShulkerVaultBlock(BlockBehaviour.Properties.of()
                     .strength(5.0f, 6.0f)
-                    .requiresCorrectToolForDrops()
-                    .sound(SoundType.VAULT)
+                    .sound(SoundType.NETHERITE_BLOCK)
             ));
 
     public static final DeferredBlock<Block> ADVANCED_SHULKER_VAULT = registerBlock("advanced_shulker_vault",
             () -> new ShulkerVaultBlock(BlockBehaviour.Properties.of()
                     .strength(5.0f, 6.0f)
-                    .requiresCorrectToolForDrops()
-                    .sound(SoundType.VAULT)
+                    .sound(SoundType.NETHERITE_BLOCK)
             ));
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {
