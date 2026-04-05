@@ -2,6 +2,7 @@ package dev.wyfy.shulkervault;
 
 import com.mojang.logging.LogUtils;
 import dev.wyfy.shulkervault.block.ModBlocks;
+import dev.wyfy.shulkervault.item.ModCreativeModeTabs;
 import dev.wyfy.shulkervault.item.ModItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -52,6 +53,8 @@ public class ShulkerVault {
         // Note that this is necessary if and only if we want *this* class (Shulker_vault) to respond directly to events.
         // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
         NeoForge.EVENT_BUS.register(this);
+
+        ModCreativeModeTabs.register(modEventBus);
 
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
