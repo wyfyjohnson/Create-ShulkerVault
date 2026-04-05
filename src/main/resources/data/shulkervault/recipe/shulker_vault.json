@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " R ",
+    "VVV",
+    " R "
+  ],
+  "key": {
+    "R": {
+      "item": "shulkervault:reinforced_shulker_shell"
+    },
+    "V": {
+      "item": "create:item_vault"
+    }
+  },
+  "result": {
+    "id": "shulkervault:shulker_vault",
+    "count": 1
+  }
+}

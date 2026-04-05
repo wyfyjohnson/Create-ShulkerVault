@@ -1,0 +1,24 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": { "item": "minecraft:shulker_shell" },
+  "transitional_item": { "id": "shulkervault:reinforced_shulker_shell" },
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [ { "item": "shulkervault:reinforced_shulker_shell" }, { "item": "create:iron_sheet" } ],
+      "results": [ { "id": "shulkervault:reinforced_shulker_shell" } ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [ { "item": "shulkervault:reinforced_shulker_shell" }, { "item": "create:iron_sheet" } ],
+      "results": [ { "id": "shulkervault:reinforced_shulker_shell" } ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [ { "item": "shulkervault:reinforced_shulker_shell" } ],
+      "results": [ { "id": "shulkervault:reinforced_shulker_shell" } ]
+    }
+  ],
+  "results": [ { "id": "shulkervault:reinforced_shulker_shell", "chance": 1.0 } ],
+  "loops": 2
+}
