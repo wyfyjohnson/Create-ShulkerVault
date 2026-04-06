@@ -1,7 +1,7 @@
 package dev.wyfy.shulkervault.block;
 
-import com.simibubi.create.AllBlocks;
 import dev.wyfy.shulkervault.ShulkerVault;
+import dev.wyfy.shulkervault.block.custom.ShulkerVaultBlock;
 import dev.wyfy.shulkervault.item.ModItems;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;

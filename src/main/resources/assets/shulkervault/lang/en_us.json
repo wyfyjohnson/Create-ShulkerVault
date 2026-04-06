@@ -1,8 +1,20 @@
 {
   "creativetab.shulkervault.shulker_vault": "Create: Shulker Vault",
+
   "item.shulkervault.reinforced_shulker_shell": "Reinforced Shulker Shell",
+
   "block.shulkervault.shulker_vault": "Shulker Vault",
   "item.shulkervault.shulker_vault": "Shulker Vault",
+
   "block.shulkervault.advanced_shulker_vault": "Advanced Shulker Vault",
-  "item.shulkervault.advanced_shulker_vault": "Advanced Shulker Vault"
+  "item.shulkervault.advanced_shulker_vault": "Advanced Shulker Vault",
+
+  "tooltip.shulkervault.header.storage": "Storage",
+  "tooltip.shulkervault.capacity": "27 Slots",
+
+  "tooltip.shulkervault.header.logistics": "Logistics",
+  "tooltip.shulkervault.package_slot_note": "Features a dedicated package handling slot",
+
+  "subtitles.shulkervault.shulker_vault_open": "Shulker Vault opens",
+  "subtitles.shulkervault.shulker_vault_close": "Shulker Vault closes"
 }
