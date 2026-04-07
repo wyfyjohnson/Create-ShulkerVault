@@ -1,6 +1,7 @@
 package dev.wyfy.shulkervault.block.custom;
 
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
+import dev.wyfy.shulkervault.block.entity.ShulkerVaultBlockEntity;
 import dev.wyfy.shulkervault.sound.ModSoundEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -16,14 +17,18 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-public class ShulkerVaultBlock extends Block implements IWrenchable {
+public class ShulkerVaultBlock extends Block implements IWrenchable, EntityBlock {
 
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
@@ -40,6 +45,12 @@ public class ShulkerVaultBlock extends Block implements IWrenchable {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return this.defaultBlockState().setValue(FACING, context.getClickedFace());
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(@NotNull BlockPos pos, @NotNull BlockState state) {
+        return new ShulkerVaultBlockEntity(pos, state);
     }
 
     @Override
