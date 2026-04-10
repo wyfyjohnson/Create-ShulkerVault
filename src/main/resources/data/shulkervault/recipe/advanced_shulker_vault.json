@@ -1,0 +1,24 @@
+{
+  "type": "create:mechanical_crafting",
+  "pattern": [
+    "E",
+    "B",
+    "V"
+  ],
+  "key": {
+    "E": {
+      "item": "create:electron_tube"
+    },
+    "B": {
+      "item": "create:packager"
+    },
+    "V": {
+      "item": "shulkervault:shulker_vault"
+    }
+  },
+  "result": {
+    "id": "shulkervault:advanced_shulker_vault",
+    "count": 1
+  },
+  "acceptMirrored": false
+}

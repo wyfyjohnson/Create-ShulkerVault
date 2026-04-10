@@ -1,6 +1,7 @@
 package dev.wyfy.shulkervault.block;
 
 import dev.wyfy.shulkervault.ShulkerVault;
+import dev.wyfy.shulkervault.block.custom.AdvancedShulkerVaultBlock;
 import dev.wyfy.shulkervault.block.custom.ShulkerVaultBlock;
 import dev.wyfy.shulkervault.item.ModItems;
 import net.minecraft.world.item.BlockItem;
@@ -26,7 +27,7 @@ public class ModBlocks {
             ));
 
     public static final DeferredBlock<Block> ADVANCED_SHULKER_VAULT = registerBlock("advanced_shulker_vault",
-            () -> new ShulkerVaultBlock(BlockBehaviour.Properties.of()
+            () -> new AdvancedShulkerVaultBlock(BlockBehaviour.Properties.of()
                     .strength(5.0f, 6.0f)
                     .sound(SoundType.NETHERITE_BLOCK)
             ));

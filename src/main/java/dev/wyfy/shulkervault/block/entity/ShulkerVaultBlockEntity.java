@@ -10,14 +10,12 @@ import org.jetbrains.annotations.NotNull;
 
 public class ShulkerVaultBlockEntity extends BlockEntity {
 
-    private final ShulkerVaultStorage storage;
+    private ShulkerVaultStorage storage;
 
     public ShulkerVaultBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.SHULKER_VAULT_BE.get(), pos, state);
-        this.storage = new ShulkerVaultStorage(
-                ShulkerVaultStorage.DEFAULT_STACK_MULTIPLIER,
-                this::setChanged
-        );
+        this.storage = new ShulkerVaultStorage(27,
+                ShulkerVaultStorage.DEFAULT_STACK_MULTIPLIER);
     }
 
     public ShulkerVaultStorage getStorage() {
@@ -34,7 +32,12 @@ public class ShulkerVaultBlockEntity extends BlockEntity {
     protected void loadAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
         super.loadAdditional(tag, registries);
         if (tag.contains("Inventory")) {
-            storage.deserializeNBT(registries, tag.getCompound("Inventory"));
+            CompoundTag inventoryTag = tag.getCompound("Inventory");
+            int multiplier =
+                    ShulkerVaultStorage.readMultiplierFromNBT(inventoryTag,
+                            ShulkerVaultStorage.DEFAULT_STACK_MULTIPLIER);
+            this.storage = new ShulkerVaultStorage(27, multiplier);
+            this.storage.deserializeNBT(registries,inventoryTag);
         }
     }
 }

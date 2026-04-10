@@ -6,6 +6,7 @@ import dev.wyfy.shulkervault.block.entity.ModBlockEntities;
 import dev.wyfy.shulkervault.item.ModCreativeModeTabs;
 import dev.wyfy.shulkervault.item.ModItems;
 import dev.wyfy.shulkervault.screen.ModMenuTypes;
+import dev.wyfy.shulkervault.sound.ModSoundEvents;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -44,6 +45,7 @@ public class ShulkerVault {
 
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
+        ModSoundEvents.register((modEventBus));
         ModBlockEntities.register(modEventBus);
 
         ModMenuTypes.register(modEventBus);

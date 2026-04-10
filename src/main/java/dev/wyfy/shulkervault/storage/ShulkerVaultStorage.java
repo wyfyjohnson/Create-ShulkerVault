@@ -1,48 +1,61 @@
 package dev.wyfy.shulkervault.storage;
 
-import net.minecraft.world.item.Item;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import org.jetbrains.annotations.NotNull;
 
 public class ShulkerVaultStorage extends ItemStackHandler {
 
-    public static final int SLOT_COUNT = 27;
-    public static final int DEFAULT_STACK_MULTIPLIER = 4;
+    private static final String TAG_STACK_MULTIPLIER = "StackMultiplier";
+    public static final int DEFAULT_STACK_MULTIPLIER= 4;
 
     private final int stackMultiplier;
-    private final Runnable changeListener;
 
-    public ShulkerVaultStorage() {
-        this(DEFAULT_STACK_MULTIPLIER, () -> {});
-    }
-
-    public ShulkerVaultStorage(int stackMultiplier, Runnable changeListener) {
-        super(SLOT_COUNT);
-        if (stackMultiplier < 1) {
-            throw new IllegalArgumentException("stackMultiplier must be >= 1, got " + stackMultiplier);
-        }
+    public ShulkerVaultStorage(int size, int stackMultiplier) {
+        super(size);
         this.stackMultiplier = stackMultiplier;
-        this.changeListener = changeListener;
-    }
-
-    @Override
-    public int getSlotLimit(int slot) {
-        return Item.ABSOLUTE_MAX_STACK_SIZE * stackMultiplier;
-    }
-
-    @Override
-    protected int getStackLimit(int slot, @NotNull ItemStack stack) {
-        return Math.min(getSlotLimit(slot), stack.getMaxStackSize() * stackMultiplier);
-    }
-
-    @Override
-    protected void onContentsChanged(int slot) {
-        super.onContentsChanged(slot);
-        changeListener.run();
     }
 
     public int getStackMultiplier() {
         return stackMultiplier;
+    }
+
+    /**
+     * The per-item insert limit for a given slot.
+     *
+     * Clamps to both the slot limit and the item's native max stack size,
+     * each scaled by the multiplier, so a 64-stack item can go up to
+     * 64 * multiplier, a 16-stack item up to 16 * multiplier, and an
+     * unstackable item up to 1 * multiplier.
+     */
+    @Override
+    protected int getStackLimit(int slot, ItemStack stack) {
+        return Math.min(getSlotLimit(slot) * stackMultiplier, stack.getMaxStackSize() * stackMultiplier);
+    }
+
+    @Override
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        CompoundTag tag = super.serializeNBT(provider);
+        tag.putInt(TAG_STACK_MULTIPLIER, stackMultiplier);
+        return tag;
+    }
+
+    @Override
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
+        super.deserializeNBT(provider, nbt);
+    }
+
+    /*
+     * Example usage in your block entity's load():
+     *   int multiplier = ShulkerVaultStorage.readMultiplierFromNBT(savedTag, 4);
+     *   this.storage = new ShulkerVaultStorage(27, multiplier);
+     *   this.storage.deserializeNBT(provider, savedTag);
+     */
+    public static int readMultiplierFromNBT(CompoundTag nbt, int defaultMultiplier) {
+        if (nbt.contains(TAG_STACK_MULTIPLIER)) {
+            return nbt.getInt(TAG_STACK_MULTIPLIER);
+        }
+        return defaultMultiplier;
     }
 }

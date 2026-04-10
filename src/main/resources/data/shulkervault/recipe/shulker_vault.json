@@ -1,11 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    " R ",
+    "XRX",
     "VVV",
-    " R "
+    "XRX"
   ],
   "key": {
+    "X": {
+      "item": "create:cogwheel"
+    },
     "R": {
       "item": "shulkervault:reinforced_shulker_shell"
     },
