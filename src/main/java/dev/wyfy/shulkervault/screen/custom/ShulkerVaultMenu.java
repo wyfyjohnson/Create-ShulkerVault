@@ -1,13 +1,11 @@
 package dev.wyfy.shulkervault.screen.custom;
 
-import dev.wyfy.shulkervault.block.ModBlocks;
 import dev.wyfy.shulkervault.block.entity.ShulkerVaultBlockEntity;
 import dev.wyfy.shulkervault.screen.ModMenuTypes;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -15,7 +13,6 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class ShulkerVaultMenu extends AbstractContainerMenu {
     public final ShulkerVaultBlockEntity blockEntity;
-    private final ContainerLevelAccess levelAccess;
 
     // Client constructor
     public ShulkerVaultMenu(int pContainerId, Inventory inv, RegistryFriendlyByteBuf extraData) {
@@ -26,7 +23,6 @@ public class ShulkerVaultMenu extends AbstractContainerMenu {
     public ShulkerVaultMenu(int pContainerId, Inventory inv, BlockEntity entity) {
         super(ModMenuTypes.SHULKER_VAULT_MENU.get(), pContainerId);
         this.blockEntity = (ShulkerVaultBlockEntity) entity;
-        this.levelAccess = ContainerLevelAccess.create(entity.getLevel(), entity.getBlockPos());
 
         addBlockEntityInventory(this.blockEntity);
         addPlayerInventory(inv);
@@ -87,7 +83,7 @@ public class ShulkerVaultMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player pPlayer) {
-        return stillValid(this.levelAccess, pPlayer, ModBlocks.SHULKER_VAULT.get());
+        return this.blockEntity != null && this.blockEntity.canPlayerUse(pPlayer);
     }
 
     private void addPlayerInventory(Inventory playerInventory) {
