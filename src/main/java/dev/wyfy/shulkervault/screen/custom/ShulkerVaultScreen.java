@@ -12,7 +12,7 @@ import net.minecraft.world.entity.player.Inventory;
 public class ShulkerVaultScreen extends AbstractContainerScreen<ShulkerVaultMenu> {
 
     private static final ResourceLocation TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(ShulkerVault.MOD_ID, "textures/gui/shulker_vault_gui.png");
+            ResourceLocation.fromNamespaceAndPath(ShulkerVault.MOD_ID, "textures/gui/shulker_vault.png");
 
     public ShulkerVaultScreen(ShulkerVaultMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);

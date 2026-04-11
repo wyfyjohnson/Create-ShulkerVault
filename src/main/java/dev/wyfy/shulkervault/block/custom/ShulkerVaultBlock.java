@@ -2,14 +2,17 @@ package dev.wyfy.shulkervault.block.custom;
 
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import dev.wyfy.shulkervault.block.entity.ShulkerVaultBlockEntity;
+import dev.wyfy.shulkervault.screen.custom.ShulkerVaultMenu;
 import dev.wyfy.shulkervault.sound.ModSoundEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -55,11 +58,29 @@ public class ShulkerVaultBlock extends Block implements IWrenchable, EntityBlock
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (!level.isClientSide()) {
-            level.playSound(null, pos, ModSoundEvents.VAULT_OPEN.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+        if (level.isClientSide()) {
+            return InteractionResult.SUCCESS;
         }
-        return InteractionResult.SUCCESS;
+
+        BlockEntity be = level.getBlockEntity(pos);
+        if (!(be instanceof ShulkerVaultBlockEntity vaultBE)) {
+            return InteractionResult.PASS;
+        }
+
+        if (player instanceof ServerPlayer serverPlayer) {
+            level.playSound(null, pos, ModSoundEvents.VAULT_OPEN.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+            serverPlayer.openMenu(
+                    new SimpleMenuProvider(
+                            (containerId, inv, p) -> new ShulkerVaultMenu(containerId, inv, vaultBE),
+                            state.getBlock().getName()
+                    ),
+                    buf -> buf.writeBlockPos(pos)
+            );
+        }
+
+        return InteractionResult.CONSUME;
     }
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         // NOTE: Create's PonderTooltipHandler will automatically inject "Hold [W] to Ponder" right above this later!
