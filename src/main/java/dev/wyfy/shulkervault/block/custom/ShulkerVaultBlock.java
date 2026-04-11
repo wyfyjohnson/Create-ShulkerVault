@@ -13,12 +13,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -29,6 +31,7 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 
 import java.util.List;
 public class ShulkerVaultBlock extends Block implements IWrenchable, EntityBlock {
@@ -98,4 +101,27 @@ public class ShulkerVaultBlock extends Block implements IWrenchable, EntityBlock
                     .append(Component.literal(" for Summary").withStyle(ChatFormatting.DARK_GRAY)));
         }
     }
+
+    @Override
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        if (!level.isClientSide && !player.isCreative()) {
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof ShulkerVaultBlockEntity vaultBE) {
+                ItemStack drop = vaultBE.toDroppedStack(level.registryAccess());
+                ItemEntity ie = new ItemEntity(level,
+                        pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, drop);
+                ie.setDefaultPickUpDelay();
+                level.addFreshEntity(ie);
+            }
+        }
+       return super.playerWillDestroy(level, pos, state, player);
     }
+
+    @Override
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+        if (level.getBlockEntity(pos) instanceof ShulkerVaultBlockEntity vaultBE) {
+            return vaultBE.toDroppedStack(level.registryAccess());
+        }
+        return super.getCloneItemStack(level, pos, state);
+    }
+}

@@ -28,6 +28,11 @@ public class ShulkerVaultStorage extends ItemStackHandler {
         return value < 1 ? 1 : value;
     }
 
+    // Slot helper for inserting items into the slot
+    public int getEffectiveStackLimit(int slot, ItemStack stack) {
+        return Math.min(getSlotLimit(slot), stack.getMaxStackSize() * getStackMultiplier());
+    }
+
     @Override
     public int getSlotLimit(int slot) {
         return 64 * getStackMultiplier();

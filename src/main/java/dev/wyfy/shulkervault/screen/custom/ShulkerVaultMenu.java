@@ -33,7 +33,8 @@ public class ShulkerVaultMenu extends AbstractContainerMenu {
         // 3 rows of 9 slots for the Vault
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 9; ++col) {
-                this.addSlot(new SlotItemHandler(entity.getStorage(), col + row * 9, 8 + col * 18, 18 + row * 18));
+//                this.addSlot(new SlotItemHandler(entity.getStorage(), col + row * 9, 8 + col * 18, 18 + row * 18));
+                this.addSlot(new OversizedSlotItemHandler(entity.getStorage(), col + row * 9, 8 + col * 18, 18 + row * 18));
             }
         }
     }

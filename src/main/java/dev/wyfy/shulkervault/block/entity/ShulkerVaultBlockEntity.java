@@ -7,6 +7,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +26,14 @@ public class ShulkerVaultBlockEntity extends BlockEntity implements IInteraction
 
     public ShulkerVaultStorage getStorage() {
         return storage;
+    }
+
+    public ItemStack toDroppedStack(HolderLookup.Provider registries) {
+        ItemStack stack = new ItemStack(getBlockState().getBlock());
+        // Writes saveAdditional() output into the BLOCK_ENTITY_DATA data component.
+        // On placement, vanilla BlockItem restores it automatically.
+        saveToItem(stack, registries);
+        return stack;
     }
 
     @Override
