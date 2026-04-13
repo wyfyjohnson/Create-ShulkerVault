@@ -1,7 +1,7 @@
 {
   "format_version": "1.9.0",
   "credit": "Made with Blockbench",
-  "parent": "template_shulker_box",
+  "parent": "minecraft:block/shulker_box",
   "ambientocclusion": false,
   "texture_size": [
     64,

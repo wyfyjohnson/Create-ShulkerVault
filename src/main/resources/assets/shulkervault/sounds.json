@@ -1,0 +1,16 @@
+{
+  "shulker_vault_open": {
+    "category": "block",
+    "subtitle": "subtitles.block.shulker_box.open",
+    "sounds": [
+      "minecraft:block/shulker_box/open"
+    ]
+  },
+  "shulker_vault_close": {
+    "category": "block",
+    "subtitle": "subtitles.block.shulker_box.close",
+    "sounds": [
+      "minecraft:block/shulker_box/close"
+    ]
+  }
+}

@@ -9,6 +9,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
@@ -19,16 +20,20 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.BlockEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -123,5 +128,42 @@ public class ShulkerVaultBlock extends Block implements IWrenchable, EntityBlock
             return vaultBE.toDroppedStack(level.registryAccess());
         }
         return super.getCloneItemStack(level, pos, state);
+    }
+
+    @Override
+    public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
+        Level level = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        Player player = context.getPlayer();
+
+        // Client side: return success early
+        if (!(level instanceof ServerLevel serverLevel)) {
+            return InteractionResult.SUCCESS;
+        }
+
+        // Fire break event for claim protection compatibility
+        BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(level, pos, state, player);
+        NeoForge.EVENT_BUS.post(event);
+        if (event.isCanceled()) {
+            return InteractionResult.SUCCESS;
+        }
+
+        // Get the drop with inventory preserved (non-creative only)
+        if (player != null && !player.isCreative()) {
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof ShulkerVaultBlockEntity vaultBE) {
+                ItemStack drop = vaultBE.toDroppedStack(level.registryAccess());
+                player.getInventory().placeItemBackInInventory(drop);
+            }
+        }
+
+        // Remove the block without loot table drops
+        state.spawnAfterBreak(serverLevel, pos, ItemStack.EMPTY, true);
+        level.destroyBlock(pos, false);
+
+        // Play Create's wrench sound
+        IWrenchable.playRemoveSound(level, pos);
+
+        return InteractionResult.SUCCESS;
     }
 }

@@ -12,13 +12,13 @@ public class ModSoundEvents {
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
             DeferredRegister.create(Registries.SOUND_EVENT, ShulkerVault.MOD_ID);
 
-    // Open sound - reuse shulker open
+    // Open sound - reuse shulker box open
     public static final DeferredHolder<SoundEvent, SoundEvent> VAULT_OPEN =
             SOUND_EVENTS.register("shulker_vault_open", () ->
                     SoundEvent.createVariableRangeEvent(
                             ResourceLocation.fromNamespaceAndPath(ShulkerVault.MOD_ID, "shulker_vault_open")));
 
-    // Open sound - reuse shulker open
+    // Open sound - reuse shulker box close
     public static final DeferredHolder<SoundEvent, SoundEvent> VAULT_CLOSE =
             SOUND_EVENTS.register("shulker_vault_close", () ->
                     SoundEvent.createVariableRangeEvent(

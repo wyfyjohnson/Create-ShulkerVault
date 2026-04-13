@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=down": { "model": "shulkervault:block/advanced_shulker_vault", "x": 180 },
+    "facing=east": { "model": "shulkervault:block/advanced_shulker_vault", "x": 90, "y": 90 },
+    "facing=north": { "model": "shulkervault:block/advanced_shulker_vault", "x": 90 },
+    "facing=south": { "model": "shulkervault:block/advanced_shulker_vault", "x": 90, "y": 180 },
+    "facing=up": { "model": "shulkervault:block/advanced_shulker_vault" },
+    "facing=west": { "model": "shulkervault:block/advanced_shulker_vault", "x": 90, "y": 270 }
+  }
+}
