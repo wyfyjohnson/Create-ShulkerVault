@@ -18,8 +18,10 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
+//import dev.wyfy.shulkervault.client.renderer.ShulkerVaultRenderer;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import org.slf4j.Logger;
@@ -75,7 +77,7 @@ public class ShulkerVault {
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
-    @EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
@@ -84,6 +86,11 @@ public class ShulkerVault {
         @SubscribeEvent
         public static void registerScreens(RegisterMenuScreensEvent event) {
             event.register(ModMenuTypes.SHULKER_VAULT_MENU.get(), ShulkerVaultScreen::new);
+        }
+
+        @SubscribeEvent
+        public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+//            event.registerBlockEntityRenderer(ModBlockEntities.SHULKER_VAULT_BE.get(), ShulkerVaultRenderer::new);
         }
     }
 }

@@ -3,7 +3,6 @@ package dev.wyfy.shulkervault.block.custom;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import dev.wyfy.shulkervault.block.entity.ShulkerVaultBlockEntity;
 import dev.wyfy.shulkervault.screen.custom.ShulkerVaultMenu;
-import dev.wyfy.shulkervault.sound.ModSoundEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -11,7 +10,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -26,14 +24,21 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.level.block.RenderShape;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.level.BlockEvent;
+import dev.wyfy.shulkervault.block.entity.ModBlockEntities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,6 +69,44 @@ public class ShulkerVaultBlock extends Block implements IWrenchable, EntityBlock
         return new ShulkerVaultBlockEntity(pos, state);
     }
 
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        return type == ModBlockEntities.SHULKER_VAULT_BE.get()
+                ? (lvl, pos, st, be) -> ((ShulkerVaultBlockEntity) be).tick()
+                : null;
+    }
+
+    /**
+     * Forward block events to the block entity (required for animation sync).
+     * This is how vanilla ShulkerBoxBlock works.
+     */
+    @Override
+    protected boolean triggerEvent(BlockState state, Level level, BlockPos pos, int id, int param) {
+        super.triggerEvent(state, level, pos, id, param);
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        return blockEntity != null && blockEntity.triggerEvent(id, param);
+    }
+
+    /**
+     * Returns collision shape using vanilla pattern via Shulker.getProgressAabb.
+     */
+    @Override
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        if (level.getBlockEntity(pos) instanceof ShulkerVaultBlockEntity vault) {
+            return Shapes.create(vault.getBoundingBox(state));
+        }
+        return Shapes.block();
+    }
+
+    @Override
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        if (level.getBlockEntity(pos) instanceof ShulkerVaultBlockEntity vault) {
+            return Shapes.create(vault.getBoundingBox(state));
+        }
+        return Shapes.block();
+    }
+
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (level.isClientSide()) {
@@ -76,7 +119,7 @@ public class ShulkerVaultBlock extends Block implements IWrenchable, EntityBlock
         }
 
         if (player instanceof ServerPlayer serverPlayer) {
-            level.playSound(null, pos, ModSoundEvents.VAULT_OPEN.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+            // Sound is now played by ContainerOpenersCounter in block entity
             serverPlayer.openMenu(
                     new SimpleMenuProvider(
                             (containerId, inv, p) -> new ShulkerVaultMenu(containerId, inv, vaultBE),
@@ -148,8 +191,7 @@ public class ShulkerVaultBlock extends Block implements IWrenchable, EntityBlock
             return InteractionResult.SUCCESS;
         }
 
-        // Get the drop with inventory preserved (non-creative only)
-        if (player != null && !player.isCreative()) {
+        {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof ShulkerVaultBlockEntity vaultBE) {
                 ItemStack drop = vaultBE.toDroppedStack(level.registryAccess());

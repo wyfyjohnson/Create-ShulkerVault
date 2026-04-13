@@ -13,6 +13,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class ShulkerVaultMenu extends AbstractContainerMenu {
     public final ShulkerVaultBlockEntity blockEntity;
+    private final Player player;
 
     // Client constructor
     public ShulkerVaultMenu(int pContainerId, Inventory inv, RegistryFriendlyByteBuf extraData) {
@@ -23,10 +24,20 @@ public class ShulkerVaultMenu extends AbstractContainerMenu {
     public ShulkerVaultMenu(int pContainerId, Inventory inv, BlockEntity entity) {
         super(ModMenuTypes.SHULKER_VAULT_MENU.get(), pContainerId);
         this.blockEntity = (ShulkerVaultBlockEntity) entity;
+        this.player = inv.player;
 
         addBlockEntityInventory(this.blockEntity);
         addPlayerInventory(inv);
         addPlayerHotbar(inv);
+
+        // Notify block entity that player opened the container
+        this.blockEntity.startOpen(this.player);
+    }
+
+    @Override
+    public void removed(Player player) {
+        super.removed(player);
+        this.blockEntity.stopOpen(player);
     }
 
     private void addBlockEntityInventory(ShulkerVaultBlockEntity entity) {
