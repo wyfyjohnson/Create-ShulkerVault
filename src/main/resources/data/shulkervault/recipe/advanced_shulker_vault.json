@@ -1,15 +1,15 @@
 {
-  "type": "create:mechanical_crafting",
+  "type": "shulkervault:vault_upgrade",
   "pattern": [
     "E",
-    "B",
+    "P",
     "V"
   ],
   "key": {
     "E": {
       "item": "create:electron_tube"
     },
-    "B": {
+    "P": {
       "item": "create:packager"
     },
     "V": {
@@ -19,6 +19,5 @@
   "result": {
     "id": "shulkervault:advanced_shulker_vault",
     "count": 1
-  },
-  "accept_mirrored": false
+  }
 }

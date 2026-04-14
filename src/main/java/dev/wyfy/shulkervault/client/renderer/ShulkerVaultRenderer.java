@@ -26,7 +26,7 @@ public class ShulkerVaultRenderer implements BlockEntityRenderer<ShulkerVaultBlo
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(ShulkerVault.MOD_ID, "textures/block/shulker_vault.png");
 
-    private static final  ResourceLocation ADVANCED_TEXTURE =
+    private static final ResourceLocation ADVANCED_TEXTURE =
             ResourceLocation.fromNamespaceAndPath(ShulkerVault.MOD_ID, "textures/block/advanced_shulker_vault.png");
 
     private final ModelPart lid;
@@ -67,7 +67,7 @@ public class ShulkerVaultRenderer implements BlockEntityRenderer<ShulkerVaultBlo
 
         // Animate lid (vanilla pattern)
         this.lid.setPos(0.0F, 24.0F - progress * 0.5F * 16.0F, 0.0F);
-        this.lid.yRot = 270.0F * progress * ((float) Math.PI / 180.0F);
+        this.lid.yRot = 180.0F * progress * ((float) Math.PI / 180.0F);
 
         // Add Advanced Shulker Vault's texture
         ResourceLocation texture = (state.getBlock() instanceof AdvancedShulkerVaultBlock)
@@ -82,40 +82,41 @@ public class ShulkerVaultRenderer implements BlockEntityRenderer<ShulkerVaultBlo
 
         poseStack.popPose();
 
-        // Render item stacks within slot
-        if (progress <= 0.0F) {
-            return;
+        // --- Floating Item Rendering ---
+        if (progress > 0.0F) {
+            ItemStack displayStack = blockEntity.getClientDisplayItem();
+            if (!displayStack.isEmpty()) {
+                poseStack.pushPose();
+
+                // 1. Move to the horizontal center, but start at the bottom (0.0 Y)
+                poseStack.translate(0.5, 0.0, 0.5);
+
+                // 2. Lift it just enough to clear the vault base (0.2)
+                // plus the animation rise (0.4 * progress)
+                // Total max Y will be 0.6, perfectly hovering inside the open lid.
+                poseStack.translate(0, 0.2 + (progress * 0.4), 0);
+
+                // 3. Constant Spinning
+                long time = System.currentTimeMillis();
+                float rotation = (time % 3600) / 10.0f;
+                poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(rotation));
+
+                // 4. Fit inside
+                poseStack.scale(0.8f, 0.8f, 0.8f);
+
+                itemRenderer.renderStatic(
+                        displayStack,
+                        ItemDisplayContext.GROUND,
+                        packedLight,
+                        OverlayTexture.NO_OVERLAY,
+                        poseStack,
+                        bufferSource,
+                        blockEntity.getLevel(),
+                        0
+                );
+
+                poseStack.popPose();
+            }
         }
-
-        ItemStack displayStack = blockEntity.getClientDisplayItem();
-
-        if (displayStack.isEmpty()) {
-            return;
-        }
-
-        // Separate pose stack for floating item
-        poseStack.pushPose();
-
-        poseStack.translate(0.5F, 0.5F, 0.5F);
-
-        poseStack.mulPose(direction.getRotation());
-
-        // Edit this line to change item render height
-        poseStack.translate(0.0F, 0.25F, 0.0F);
-        poseStack.scale(0.5F,0.5F, 0.5F);
-
-        itemRenderer.renderStatic(
-                displayStack,
-                ItemDisplayContext.GROUND,
-                packedLight,
-                OverlayTexture.NO_OVERLAY,
-                poseStack,
-                bufferSource,
-                blockEntity.getLevel(),
-                0
-        );
-
-        poseStack.popPose();
-
     }
 }

@@ -5,7 +5,9 @@ import dev.wyfy.shulkervault.block.ModBlocks;
 import dev.wyfy.shulkervault.block.entity.ModBlockEntities;
 import dev.wyfy.shulkervault.item.ModCreativeModeTabs;
 import dev.wyfy.shulkervault.item.ModItems;
+import dev.wyfy.shulkervault.recipe.ModRecipeSerializers;
 import dev.wyfy.shulkervault.screen.ModMenuTypes;
+import dev.wyfy.shulkervault.screen.custom.AdvancedShulkerVaultScreen;
 import dev.wyfy.shulkervault.screen.custom.ShulkerVaultScreen;
 import dev.wyfy.shulkervault.sound.ModSoundEvents;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -53,6 +55,7 @@ public class ShulkerVault {
         ModBlockEntities.register(modEventBus);
 
         ModMenuTypes.register(modEventBus);
+        ModRecipeSerializers.register(modEventBus);
 
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
@@ -86,11 +89,13 @@ public class ShulkerVault {
         @SubscribeEvent
         public static void registerScreens(RegisterMenuScreensEvent event) {
             event.register(ModMenuTypes.SHULKER_VAULT_MENU.get(), ShulkerVaultScreen::new);
+            event.register(ModMenuTypes.ADVANCED_SHULKER_VAULT_MENU.get(), AdvancedShulkerVaultScreen::new);
         }
 
         @SubscribeEvent
         public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
             event.registerBlockEntityRenderer(ModBlockEntities.SHULKER_VAULT_BE.get(), ShulkerVaultRenderer::new);
+            event.registerBlockEntityRenderer(ModBlockEntities.ADVANCED_SHULKER_VAULT_BE.get(), ShulkerVaultRenderer::new);
         }
     }
 }

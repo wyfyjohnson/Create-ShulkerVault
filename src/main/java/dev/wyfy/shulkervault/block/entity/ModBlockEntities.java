@@ -17,7 +17,12 @@ public class ModBlockEntities {
     public static final Supplier<BlockEntityType<ShulkerVaultBlockEntity>> SHULKER_VAULT_BE =
             BLOCK_ENTITIES.register("shulker_vault_be", () -> BlockEntityType.Builder.of(
                     ShulkerVaultBlockEntity::new,
-                    ModBlocks.SHULKER_VAULT.get(),
+                    ModBlocks.SHULKER_VAULT.get()
+            ).build(null));
+
+    public static final Supplier<BlockEntityType<AdvancedShulkerVaultBlockEntity>> ADVANCED_SHULKER_VAULT_BE =
+            BLOCK_ENTITIES.register("advanced_shulker_vault_be", () -> BlockEntityType.Builder.of(
+                    AdvancedShulkerVaultBlockEntity::new,
                     ModBlocks.ADVANCED_SHULKER_VAULT.get()
             ).build(null));
 

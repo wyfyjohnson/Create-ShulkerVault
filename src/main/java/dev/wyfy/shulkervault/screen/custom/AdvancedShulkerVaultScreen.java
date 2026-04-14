@@ -10,13 +10,18 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 
-public class ShulkerVaultScreen extends AbstractContainerScreen<ShulkerVaultMenu> {
+/**
+ * Screen for AdvancedShulkerVault with wider texture to accommodate package slot.
+ */
+public class AdvancedShulkerVaultScreen extends AbstractContainerScreen<AdvancedShulkerVaultMenu> {
 
     private static final ResourceLocation TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(ShulkerVault.MOD_ID, "textures/gui/shulker_vault.png");
+            ResourceLocation.fromNamespaceAndPath(ShulkerVault.MOD_ID, "textures/gui/advanced_shulker_vault.png");
 
-    public ShulkerVaultScreen(ShulkerVaultMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
-        super(pMenu, pPlayerInventory, pTitle);
+    public AdvancedShulkerVaultScreen(AdvancedShulkerVaultMenu menu, Inventory playerInventory, Component title) {
+        super(menu, playerInventory, title);
+        // Wider image to accommodate package slot on right
+        this.imageWidth = 194;
     }
 
     @Override
@@ -25,7 +30,7 @@ public class ShulkerVaultScreen extends AbstractContainerScreen<ShulkerVaultMenu
     }
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
+    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
@@ -40,22 +45,29 @@ public class ShulkerVaultScreen extends AbstractContainerScreen<ShulkerVaultMenu
         renderBackground(guiGraphics, mouseX, mouseY, delta);
         super.render(guiGraphics, mouseX, mouseY, delta);
         renderTooltip(guiGraphics, mouseX, mouseY);
-        // 1. Default to the item in the very first vault slot
 
+        // Display item logic - package slot takes priority if non-empty (per CLAUDE.md)
         ItemStack itemToDisplay = ItemStack.EMPTY;
-        if (!this.menu.slots.isEmpty()) {
-            itemToDisplay = this.menu.slots.get(0).getItem();
+
+        // Check package slot first (slot index 63 = 36 player + 27 vault)
+        ItemStack packageItem = this.menu.getBlockEntity().getPackageSlot().getStackInSlot(0);
+        if (!packageItem.isEmpty()) {
+            itemToDisplay = packageItem;
+        } else if (!this.menu.slots.isEmpty() && this.menu.slots.size() > 36) {
+            // Default to first vault slot (index 36 = after player inventory)
+            itemToDisplay = this.menu.slots.get(36).getItem();
         }
 
-        // 2. If hovering over a vault slot, use that item instead
+        // Override with hovered slot if it's a vault or package slot
         if (this.hoveredSlot != null) {
             int menuIndex = this.menu.slots.indexOf(this.hoveredSlot);
-            if (menuIndex >= 0 && menuIndex < 27) { // 0-26 are the vault slots
+            // Vault slots are 36-62, package slot is 63
+            if (menuIndex >= 36 && menuIndex <= 63) {
                 itemToDisplay = this.hoveredSlot.getItem();
             }
         }
 
-        // 3. Hand the actual item to the Block Entity
+        // Hand the actual item to the Block Entity for renderer to display
         this.menu.getBlockEntity().setClientDisplayItem(itemToDisplay);
     }
 }

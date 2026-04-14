@@ -5,7 +5,6 @@ import dev.wyfy.shulkervault.Config;
 import dev.wyfy.shulkervault.block.custom.ShulkerVaultBlock;
 import dev.wyfy.shulkervault.sound.ModSoundEvents;
 import dev.wyfy.shulkervault.storage.ShulkerVaultStorage;
-import dev.wyfy.shulkervault.screen.custom.ShulkerVaultMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -21,6 +20,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.PushReaction;
@@ -47,10 +47,10 @@ public class ShulkerVaultBlockEntity extends BlockEntity implements IInteraction
     private float progress;
     private float progressOld;
 
-    // Item slot/hover animation
+    // Item slot/hover animation variables and methods
     private ItemStack clientDisplayItem = ItemStack.EMPTY;
 
-    public void setClientDisplaySlot(ItemStack stack) {
+    public void setClientDisplayItem(ItemStack stack) {
         this.clientDisplayItem = stack;
     }
 
@@ -59,7 +59,14 @@ public class ShulkerVaultBlockEntity extends BlockEntity implements IInteraction
     }
 
     public ShulkerVaultBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.SHULKER_VAULT_BE.get(), pos, state);
+        this(ModBlockEntities.SHULKER_VAULT_BE.get(), pos, state);
+    }
+
+    /**
+     * Protected constructor for subclasses to specify their own BlockEntityType.
+     */
+    protected ShulkerVaultBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
         this.storage = new ShulkerVaultStorage(
                 () -> Config.stackMultiplier,
                 this::setChanged
