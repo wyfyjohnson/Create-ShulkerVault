@@ -47,6 +47,17 @@ public class ShulkerVaultBlockEntity extends BlockEntity implements IInteraction
     private float progress;
     private float progressOld;
 
+    // Item slot/hover animation
+    private ItemStack clientDisplayItem = ItemStack.EMPTY;
+
+    public void setClientDisplaySlot(ItemStack stack) {
+        this.clientDisplayItem = stack;
+    }
+
+    public ItemStack getClientDisplayItem() {
+        return this.clientDisplayItem;
+    }
+
     public ShulkerVaultBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.SHULKER_VAULT_BE.get(), pos, state);
         this.storage = new ShulkerVaultStorage(

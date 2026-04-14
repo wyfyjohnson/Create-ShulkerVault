@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
 public class ShulkerVaultScreen extends AbstractContainerScreen<ShulkerVaultMenu> {
 
@@ -21,9 +22,6 @@ public class ShulkerVaultScreen extends AbstractContainerScreen<ShulkerVaultMenu
     @Override
     protected void init() {
         super.init();
-        // Optional: Kaupenjoe sometimes pushes labels off-screen if they overlap textures
-        // this.inventoryLabelY = 10000;
-        // this.titleLabelY = 10000;
     }
 
     @Override
@@ -42,5 +40,22 @@ public class ShulkerVaultScreen extends AbstractContainerScreen<ShulkerVaultMenu
         renderBackground(guiGraphics, mouseX, mouseY, delta);
         super.render(guiGraphics, mouseX, mouseY, delta);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        // 1. Default to the item in the very first vault slot
+
+        ItemStack itemToDisplay = ItemStack.EMPTY;
+        if (!this.menu.slots.isEmpty()) {
+            itemToDisplay = this.menu.slots.get(0).getItem();
+        }
+
+        // 2. If hovering over a vault slot, use that item instead
+        if (this.hoveredSlot != null) {
+            int menuIndex = this.menu.slots.indexOf(this.hoveredSlot);
+            if (menuIndex >= 0 && menuIndex < 27) { // 0-26 are the vault slots
+                itemToDisplay = this.hoveredSlot.getItem();
+            }
+        }
+
+        // 3. Hand the actual item to the Block Entity
+        this.menu.getBlockEntity().setClientDisplaySlot(itemToDisplay);
     }
 }

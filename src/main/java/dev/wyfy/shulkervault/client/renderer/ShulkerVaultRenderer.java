@@ -6,14 +6,19 @@ import dev.wyfy.shulkervault.ShulkerVault;
 import dev.wyfy.shulkervault.block.custom.AdvancedShulkerVaultBlock;
 import dev.wyfy.shulkervault.block.custom.ShulkerVaultBlock;
 import dev.wyfy.shulkervault.block.entity.ShulkerVaultBlockEntity;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class ShulkerVaultRenderer implements BlockEntityRenderer<ShulkerVaultBlockEntity> {
@@ -27,11 +32,15 @@ public class ShulkerVaultRenderer implements BlockEntityRenderer<ShulkerVaultBlo
     private final ModelPart lid;
     private final ModelPart base;
 
+    private final ItemRenderer itemRenderer;
+
     public ShulkerVaultRenderer(BlockEntityRendererProvider.Context context) {
         // Use vanilla's ShulkerModel layer (matches 64x64 texture with vanilla shulker UVs)
         ModelPart root = context.bakeLayer(ModelLayers.SHULKER);
         this.lid = root.getChild("lid");
         this.base = root.getChild("base");
+
+        this.itemRenderer = Minecraft.getInstance().getItemRenderer();
     }
 
     @Override
@@ -72,5 +81,41 @@ public class ShulkerVaultRenderer implements BlockEntityRenderer<ShulkerVaultBlo
         this.base.render(poseStack, vertexConsumer, packedLight, packedOverlay);
 
         poseStack.popPose();
+
+        // Render item stacks within slot
+        if (progress <= 0.0F) {
+            return;
+        }
+
+        ItemStack displayStack = blockEntity.getClientDisplayItem();
+
+        if (displayStack.isEmpty()) {
+            return;
+        }
+
+        // Separate pose stack for floating item
+        poseStack.pushPose();
+
+        poseStack.translate(0.5F, 0.5F, 0.5F);
+
+        poseStack.mulPose(direction.getRotation());
+
+        // Edit this line to change item render height
+        poseStack.translate(0.0F, 0.25F, 0.0F);
+        poseStack.scale(0.5F,0.5F, 0.5F);
+
+        itemRenderer.renderStatic(
+                displayStack,
+                ItemDisplayContext.GROUND,
+                packedLight,
+                OverlayTexture.NO_OVERLAY,
+                poseStack,
+                bufferSource,
+                blockEntity.getLevel(),
+                0
+        );
+
+        poseStack.popPose();
+
     }
 }

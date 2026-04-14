@@ -15,6 +15,10 @@ public class ShulkerVaultMenu extends AbstractContainerMenu {
     public final ShulkerVaultBlockEntity blockEntity;
     private final Player player;
 
+    public ShulkerVaultBlockEntity getBlockEntity() {
+        return this.blockEntity;
+    }
+
     // Client constructor
     public ShulkerVaultMenu(int pContainerId, Inventory inv, RegistryFriendlyByteBuf extraData) {
         this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()));
