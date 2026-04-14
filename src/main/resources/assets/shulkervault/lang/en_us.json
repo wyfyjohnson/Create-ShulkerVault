@@ -10,7 +10,9 @@
   "item.shulkervault.advanced_shulker_vault": "Advanced Shulker Vault",
 
   "tooltip.shulkervault.header.storage": "Storage",
-  "tooltip.shulkervault.capacity": "27 Slots",
+  "tooltip.shulkervault.contains_items": "Contains items",
+  "tooltip.shulkervault.empty": "Empty",
+  "tooltip.shulkervault.capacity": "27 slots",
 
   "tooltip.shulkervault.header.logistics": "Logistics",
   "tooltip.shulkervault.package_slot_note": "Features a dedicated package handling slot",

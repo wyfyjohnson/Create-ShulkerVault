@@ -2,13 +2,19 @@ package dev.wyfy.shulkervault.screen.custom;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.wyfy.shulkervault.ShulkerVault;
+import dev.wyfy.shulkervault.network.VaultAction;
+import dev.wyfy.shulkervault.network.VaultInventoryActionPayload;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.network.PacketDistributor;
+import org.jetbrains.annotations.Nullable;
 
 public class ShulkerVaultScreen extends AbstractContainerScreen<ShulkerVaultMenu> {
 
@@ -57,5 +63,22 @@ public class ShulkerVaultScreen extends AbstractContainerScreen<ShulkerVaultMenu
 
         // 3. Hand the actual item to the Block Entity
         this.menu.getBlockEntity().setClientDisplayItem(itemToDisplay);
+    }
+
+    @Override
+    protected void slotClicked(@Nullable Slot slot, int slotId, int mouseButton, ClickType type) {
+        // Check for Ctrl+Shift+Left-Click on a valid slot
+        if (slot != null && hasShiftDown() && hasControlDown() && mouseButton == 0) {
+            // Send our custom packet instead of vanilla behavior
+            PacketDistributor.sendToServer(new VaultInventoryActionPayload(
+                    VaultAction.CTRL_SHIFT_CLICK,
+                    this.menu.containerId,
+                    slot.index
+            ));
+            return; // Cancel vanilla click action
+        }
+
+        // Default vanilla behavior for all other clicks
+        super.slotClicked(slot, slotId, mouseButton, type);
     }
 }

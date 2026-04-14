@@ -2,6 +2,7 @@ package dev.wyfy.shulkervault.screen.custom;
 
 import dev.wyfy.shulkervault.block.entity.ShulkerVaultBlockEntity;
 import dev.wyfy.shulkervault.screen.ModMenuTypes;
+import dev.wyfy.shulkervault.storage.ShulkerVaultStorage;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -100,6 +101,92 @@ public class ShulkerVaultMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player pPlayer) {
         return this.blockEntity != null && this.blockEntity.canPlayerUse(pPlayer);
+    }
+
+    public void handleCtrlShiftClick(int slotIndex) {
+        // Validate slot index
+        if (slotIndex < 0 || slotIndex >= this.slots.size()) {
+            return;
+        }
+
+        Slot clickedSlot = this.slots.get(slotIndex);
+        if (clickedSlot == null || !clickedSlot.hasItem()) {
+            return;
+        }
+
+        final int VAULT_SLOT_COUNT = 27;
+        boolean isVaultSlot = slotIndex < VAULT_SLOT_COUNT;
+
+        ShulkerVaultStorage storage = blockEntity.getStorage();
+
+        if (isVaultSlot) {
+            // === VAULT → PLAYER ===
+            int storageSlot = slotIndex; // Direct 1:1 mapping
+
+            // Extract entire oversized stack from vault
+            ItemStack toMove = storage.extractItem(storageSlot, Integer.MAX_VALUE, false);
+            if (toMove.isEmpty()) {
+                return;
+            }
+
+            // Insert into player slots (indices 27+), respecting vanilla limits
+            ItemStack remaining = toMove;
+            for (int i = VAULT_SLOT_COUNT; i < this.slots.size() && !remaining.isEmpty(); i++) {
+                Slot destSlot = this.slots.get(i);
+
+                if (!destSlot.mayPlace(remaining)) {
+                    continue;
+                }
+
+                ItemStack destStack = destSlot.getItem();
+                int maxStackSize = Math.min(remaining.getMaxStackSize(), destSlot.getMaxStackSize(remaining));
+
+                if (destStack.isEmpty()) {
+                    // Empty slot: place up to vanilla limit
+                    int toInsert = Math.min(remaining.getCount(), maxStackSize);
+                    destSlot.set(remaining.split(toInsert));
+                } else if (ItemStack.isSameItemSameComponents(destStack, remaining)) {
+                    // Matching stack: merge up to vanilla limit
+                    int space = maxStackSize - destStack.getCount();
+                    int toInsert = Math.min(remaining.getCount(), space);
+                    if (toInsert > 0) {
+                        destStack.grow(toInsert);
+                        remaining.shrink(toInsert);
+                        destSlot.setChanged();
+                    }
+                }
+            }
+
+            // Return any remainder back to the vault
+            if (!remaining.isEmpty()) {
+                ItemStack leftover = storage.insertItem(storageSlot, remaining, false);
+                // Fallback: try any vault slot if original is full
+                for (int i = 0; i < VAULT_SLOT_COUNT && !leftover.isEmpty(); i++) {
+                    leftover = storage.insertItem(i, leftover, false);
+                }
+            }
+
+        } else {
+            // === PLAYER → VAULT ===
+            ItemStack toMove = clickedSlot.getItem().copy();
+            clickedSlot.set(ItemStack.EMPTY);
+
+            // Insert into vault slots, respecting oversized limits
+            ItemStack remaining = toMove;
+            for (int i = 0; i < VAULT_SLOT_COUNT && !remaining.isEmpty(); i++) {
+                remaining = storage.insertItem(i, remaining, false);
+            }
+
+            // Return any remainder back to the player slot
+            if (!remaining.isEmpty()) {
+                clickedSlot.set(remaining);
+            }
+
+            clickedSlot.setChanged();
+        }
+
+        // Sync to client
+        this.broadcastChanges();
     }
 
     private void addPlayerInventory(Inventory playerInventory) {
