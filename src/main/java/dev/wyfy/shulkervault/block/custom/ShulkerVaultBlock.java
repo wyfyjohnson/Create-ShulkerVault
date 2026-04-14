@@ -63,6 +63,11 @@ public class ShulkerVaultBlock extends Block implements IWrenchable, EntityBlock
         return this.defaultBlockState().setValue(FACING, context.getClickedFace());
     }
 
+    @Override
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.ENTITYBLOCK_ANIMATED;
+    }
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(@NotNull BlockPos pos, @NotNull BlockState state) {

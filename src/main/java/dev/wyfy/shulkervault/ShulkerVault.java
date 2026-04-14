@@ -21,7 +21,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
-//import dev.wyfy.shulkervault.client.renderer.ShulkerVaultRenderer;
+import dev.wyfy.shulkervault.client.renderer.ShulkerVaultRenderer;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import org.slf4j.Logger;
@@ -90,7 +90,7 @@ public class ShulkerVault {
 
         @SubscribeEvent
         public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-//            event.registerBlockEntityRenderer(ModBlockEntities.SHULKER_VAULT_BE.get(), ShulkerVaultRenderer::new);
+            event.registerBlockEntityRenderer(ModBlockEntities.SHULKER_VAULT_BE.get(), ShulkerVaultRenderer::new);
         }
     }
 }
