@@ -4,7 +4,7 @@ import dev.wyfy.shulkervault.ShulkerVault;
 import dev.wyfy.shulkervault.block.custom.AdvancedShulkerVaultBlock;
 import dev.wyfy.shulkervault.block.custom.ShulkerVaultBlock;
 import dev.wyfy.shulkervault.item.ModItems;
-import net.minecraft.world.item.BlockItem;
+import dev.wyfy.shulkervault.item.custom.ShulkerVaultBlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -41,7 +41,7 @@ public class ModBlocks {
     }
 
     private static <T extends Block> void registerBlockItem(String name, DeferredBlock<T> block) {
-        ModItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
+        ModItems.ITEMS.register(name, () -> new ShulkerVaultBlockItem(block.get(), new Item.Properties()));
     }
 
     public static void register(IEventBus eventBus) {

@@ -1,13 +1,14 @@
 package dev.wyfy.shulkervault.block.entity;
 
-import dev.wyfy.shulkervault.Config;
+import com.simibubi.create.content.logistics.box.PackageItem;
 import dev.wyfy.shulkervault.block.ModBlocks;
-import dev.wyfy.shulkervault.storage.ShulkerVaultStorage;
+import dev.wyfy.shulkervault.storage.AdvancedVaultItemHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,8 +22,7 @@ public class AdvancedShulkerVaultBlockEntity extends ShulkerVaultBlockEntity {
     private final ItemStackHandler packageSlot = new ItemStackHandler(1) {
         @Override
         public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-            // TODO: Check if item is a Create package once package handling is implemented
-            return true;
+            return PackageItem.isPackage(stack);
         }
 
         @Override
@@ -31,12 +31,59 @@ public class AdvancedShulkerVaultBlockEntity extends ShulkerVaultBlockEntity {
         }
     };
 
+    // Cached item handler for capability exposure (avoids per-tick allocations)
+    private final AdvancedVaultItemHandler itemHandler = new AdvancedVaultItemHandler(this);
+
+    // Outbox state: true if package slot contains a locally-made package (don't auto-unpack)
+    private boolean holdingOutboxPackage = false;
+
     public AdvancedShulkerVaultBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.ADVANCED_SHULKER_VAULT_BE.get(), pos, state);
     }
 
     public ItemStackHandler getPackageSlot() {
         return packageSlot;
+    }
+
+    /**
+     * Returns the cached item handler for capability exposure.
+     * Contains all package detection, unpacking, and routing logic.
+     */
+    public IItemHandler getItemHandler() {
+        return itemHandler;
+    }
+
+    public boolean isHoldingOutboxPackage() {
+        return holdingOutboxPackage;
+    }
+
+    public void setHoldingOutboxPackage(boolean holding) {
+        if (this.holdingOutboxPackage != holding) {
+            this.holdingOutboxPackage = holding;
+            this.setChanged();
+        }
+    }
+
+    // ==================== Redstone Packaging ====================
+
+    /**
+     * Called by the block on redstone rising edge.
+     * Attempts to create a package from vault contents.
+     */
+    public void triggerPackaging() {
+        itemHandler.tryPackPackage();
+    }
+
+    // ==================== Event-Driven Buffer Draining ====================
+
+    @Override
+    public void setChanged() {
+        super.setChanged();
+        // Trigger auto-drain whenever inventory state changes
+        // The handler's processing guard prevents infinite recursion
+        if (itemHandler != null) {
+            itemHandler.tryDrainPackageSlot();
+        }
     }
 
     @Override
@@ -52,6 +99,7 @@ public class AdvancedShulkerVaultBlockEntity extends ShulkerVaultBlockEntity {
     protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
         super.saveAdditional(tag, registries);
         tag.put("PackageSlot", packageSlot.serializeNBT(registries));
+        tag.putBoolean("HoldingOutboxPackage", holdingOutboxPackage);
     }
 
     @Override
@@ -60,5 +108,6 @@ public class AdvancedShulkerVaultBlockEntity extends ShulkerVaultBlockEntity {
         if (tag.contains("PackageSlot")) {
             packageSlot.deserializeNBT(registries, tag.getCompound("PackageSlot"));
         }
+        holdingOutboxPackage = tag.getBoolean("HoldingOutboxPackage");
     }
 }

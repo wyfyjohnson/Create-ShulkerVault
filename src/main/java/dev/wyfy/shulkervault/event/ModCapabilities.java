@@ -6,7 +6,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 
 @EventBusSubscriber(modid = ShulkerVault.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class ModCapabilities {
@@ -20,14 +19,11 @@ public class ModCapabilities {
                 (blockEntity, side) -> blockEntity.getStorage()
         );
 
-        // Advanced vault - exposes combined handler (main storage + package slot)
+        // Advanced vault - exposes cached package-aware handler
         event.registerBlockEntity(
                 Capabilities.ItemHandler.BLOCK,
                 ModBlockEntities.ADVANCED_SHULKER_VAULT_BE.get(),
-                (blockEntity, side) -> new CombinedInvWrapper(
-                        blockEntity.getStorage(),
-                        blockEntity.getPackageSlot()
-                )
+                (blockEntity, side) -> blockEntity.getItemHandler()
         );
     }
 }

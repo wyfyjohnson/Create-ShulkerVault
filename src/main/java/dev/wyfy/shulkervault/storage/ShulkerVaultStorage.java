@@ -1,7 +1,9 @@
 package dev.wyfy.shulkervault.storage;
 
-import net.minecraft.nbt.CompoundTag;
+import com.simibubi.create.content.logistics.box.PackageItem;
+import dev.wyfy.shulkervault.block.ModBlocks;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -42,6 +44,27 @@ public class ShulkerVaultStorage extends ItemStackHandler {
     @Override
     protected int getStackLimit(int slot, @NotNull ItemStack stack) {
         return Math.min(getSlotLimit(slot), stack.getMaxStackSize() * getStackMultiplier());
+    }
+
+    @Override
+    public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+        // Reject items that can't fit inside containers (shulker boxes, bundles, etc.)
+        if (!stack.getItem().canFitInsideContainerItems()) {
+            return false;
+        }
+
+        // Reject Create packages (must be unpacked, not stored directly)
+        if (stack.getItem() instanceof PackageItem) {
+            return false;
+        }
+
+        // Reject our own vault items to prevent NBT inception
+        if (stack.is(ModBlocks.SHULKER_VAULT.asItem()) ||
+            stack.is(ModBlocks.ADVANCED_SHULKER_VAULT.asItem())) {
+            return false;
+        }
+
+        return super.isItemValid(slot, stack);
     }
 
     @Override

@@ -55,41 +55,58 @@ public class ShulkerVaultMenu extends AbstractContainerMenu {
         }
     }
 
-    private static final int HOTBAR_SLOT_COUNT = 9;
-    private static final int PLAYER_INVENTORY_ROW_COUNT = 3;
-    private static final int PLAYER_INVENTORY_COLUMN_COUNT = 9;
-    private static final int PLAYER_INVENTORY_SLOT_COUNT = PLAYER_INVENTORY_COLUMN_COUNT * PLAYER_INVENTORY_ROW_COUNT;
-    private static final int VANILLA_SLOT_COUNT = HOTBAR_SLOT_COUNT + PLAYER_INVENTORY_SLOT_COUNT;
-    private static final int VANILLA_FIRST_SLOT_INDEX = 0;
-    private static final int TE_INVENTORY_FIRST_SLOT_INDEX = VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT;
-    private static final int TE_INVENTORY_SLOT_COUNT = 27;  // must be the number of slots you have!
+    // Slot layout: Vault slots 0-26, then player inventory 27-53, then hotbar 54-62
+    private static final int TE_INVENTORY_SLOT_COUNT = 27;
+    private static final int TE_INVENTORY_FIRST_SLOT_INDEX = 0;
+    private static final int VANILLA_FIRST_SLOT_INDEX = TE_INVENTORY_SLOT_COUNT;
+    private static final int VANILLA_SLOT_COUNT = 36;
 
     @Override
     public ItemStack quickMoveStack(Player playerIn, int pIndex) {
         Slot sourceSlot = this.slots.get(pIndex);
-        if (sourceSlot == null || !sourceSlot.hasItem()) return ItemStack.EMPTY;  //EMPTY_ITEM
+        if (sourceSlot == null || !sourceSlot.hasItem()) return ItemStack.EMPTY;
 
         ItemStack sourceStack = sourceSlot.getItem();
         ItemStack copyOfSourceStack = sourceStack.copy();
 
-        // Check if the slot clicked is one of the vanilla container slots
-        if (pIndex < VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT) {
-            // This is a vanilla container slot so merge the stack into the tile inventory
-            if (!moveItemStackTo(sourceStack, TE_INVENTORY_FIRST_SLOT_INDEX, TE_INVENTORY_FIRST_SLOT_INDEX + TE_INVENTORY_SLOT_COUNT, false)) {
-                return ItemStack.EMPTY;  // EMPTY_ITEM
-            }
-        } else if (pIndex < TE_INVENTORY_FIRST_SLOT_INDEX + TE_INVENTORY_SLOT_COUNT) {
-            // This is a TE slot so merge the stack into the players inventory
-            if (!moveItemStackTo(sourceStack, VANILLA_FIRST_SLOT_INDEX, VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT, false)) {
+        // Vault slot clicked (indices 0-26) → move to player inventory
+        if (pIndex < TE_INVENTORY_SLOT_COUNT) {
+            // For oversized stacks: split off one vanilla stack's worth
+            int toMove = Math.min(sourceStack.getCount(), sourceStack.getMaxStackSize());
+            ItemStack splitStack = sourceStack.copyWithCount(toMove);
+
+            if (!moveItemStackTo(splitStack, VANILLA_FIRST_SLOT_INDEX, VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT, false)) {
                 return ItemStack.EMPTY;
             }
+
+            // Calculate how many actually moved
+            int moved = toMove - splitStack.getCount();
+            if (moved > 0) {
+                sourceStack.shrink(moved);
+            }
+        }
+        // Player inventory slot clicked (indices 27-62) → move to vault
+        else if (pIndex < VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT) {
+            ShulkerVaultStorage storage = blockEntity.getStorage();
+            ItemStack remaining = sourceStack.copy();
+
+            // Custom insertion loop to respect oversized slot limits
+            for (int i = 0; i < TE_INVENTORY_SLOT_COUNT && !remaining.isEmpty(); i++) {
+                remaining = storage.insertItem(i, remaining, false);
+            }
+
+            // Calculate what was actually moved and update the source slot
+            if (remaining.getCount() != sourceStack.getCount()) {
+                sourceStack.setCount(remaining.getCount());
+            } else {
+                return ItemStack.EMPTY; // Nothing moved
+            }
         } else {
-            System.out.println("Invalid slotIndex:" + pIndex);
             return ItemStack.EMPTY;
         }
 
-        // If stack size == 0 (the entire stack was moved) set slot contents to null
-        if (sourceStack.getCount() == 0) {
+        // Update slot state
+        if (sourceStack.isEmpty()) {
             sourceSlot.set(ItemStack.EMPTY);
         } else {
             sourceSlot.setChanged();
