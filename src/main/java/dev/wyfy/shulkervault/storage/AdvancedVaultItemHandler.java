@@ -2,6 +2,7 @@ package dev.wyfy.shulkervault.storage;
 
 import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.content.logistics.box.PackageItem;
+import com.simibubi.create.content.logistics.packagePort.frogport.FrogportBlockEntity;
 import dev.wyfy.shulkervault.block.entity.AdvancedShulkerVaultBlockEntity;
 import dev.wyfy.shulkervault.sound.ModSoundEvents;
 import net.minecraft.core.BlockPos;
@@ -164,9 +165,46 @@ public class AdvancedVaultItemHandler implements IItemHandler {
             // Play packaging sound
             ModSoundEvents.playPackageRouted(level, blockEntity.getBlockPos());
 
+            // Notify a Frogport directly above to pull the new package
+            wakeTheFrogs();
+
             return true;
         } finally {
             isProcessing = false;
+        }
+    }
+
+    /**
+     * Hands off the outbox package directly to a Frogport above the vault.
+     *
+     * The Frogport's tryPullingFrom() applies an address filter bypass only for
+     * {@code PackagerItemHandler} instances. Since our handler isn't one, the
+     * filter can block the pull. Instead we hand the package to the Frogport's
+     * startAnimation() directly — the same mechanism the Packager ultimately
+     * uses to launch packages onto the chain conveyor.
+     *
+     * If the Frogport accepts the package (animation starts), we clear the
+     * package slot. If it can't (no target, busy, etc.), the package stays
+     * in the slot for manual retrieval or a later attempt.
+     */
+    private void wakeTheFrogs() {
+        Level level = blockEntity.getLevel();
+        if (level == null || level.isClientSide()) return;
+
+        BlockPos above = blockEntity.getBlockPos().above();
+        if (!(level.getBlockEntity(above) instanceof FrogportBlockEntity port)) return;
+        if (port.isAnimationInProgress()) return;
+
+        ItemStack packageStack = blockEntity.getPackageSlot().getStackInSlot(0);
+        if (packageStack.isEmpty() || !PackageItem.isPackage(packageStack)) return;
+
+        // Hand the package to the Frogport — it checks its own target validity
+        port.startAnimation(packageStack.copy(), true);
+
+        // If the Frogport accepted, its animation is now in progress
+        if (port.isAnimationInProgress()) {
+            blockEntity.getPackageSlot().setStackInSlot(0, ItemStack.EMPTY);
+            blockEntity.setHoldingOutboxPackage(false);
         }
     }
 
